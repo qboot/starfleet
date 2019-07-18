@@ -86,7 +86,7 @@ def upgrade():
     """
     Upgrade application dependencies (composer only)
     """
-    docker_compose_run('COMPOSER_MEMORY_LIMIT=-1 composer update -n')
+    docker_compose_run('COMPOSER_MEMORY_LIMIT=-1 composer update -n -vvv')
 
 
 @task

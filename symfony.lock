@@ -113,9 +113,6 @@
             "ref": "9d60c231a92e69c68b89897813ec4931d0697b1f"
         }
     },
-    "fzaninotto/faker": {
-        "version": "v1.7.1"
-    },
     "gedmo/doctrine-extensions": {
         "version": "v2.4.31"
     },
@@ -137,20 +134,17 @@
     "league/oauth2-client": {
         "version": "2.2.1"
     },
+    "league/oauth2-github": {
+        "version": "2.0.0"
+    },
     "league/oauth2-google": {
         "version": "2.0.1"
     },
     "monolog/monolog": {
         "version": "1.23.0"
     },
-    "myclabs/deep-copy": {
-        "version": "1.7.0"
-    },
     "myclabs/php-enum": {
         "version": "1.6.4"
-    },
-    "nelmio/alice": {
-        "version": "v3.1.2"
     },
     "nikic/php-parser": {
         "version": "v3.1.3"
@@ -169,6 +163,9 @@
     },
     "paragonie/random_compat": {
         "version": "v2.0.11"
+    },
+    "php": {
+        "version": "7.3"
     },
     "php-cs-fixer/diff": {
         "version": "v1.2.0"
@@ -205,18 +202,6 @@
     },
     "ralouphie/getallheaders": {
         "version": "2.0.5"
-    },
-    "sebastian/comparator": {
-        "version": "3.0.2"
-    },
-    "sebastian/diff": {
-        "version": "3.0.1"
-    },
-    "sebastian/exporter": {
-        "version": "3.1.0"
-    },
-    "sebastian/recursion-context": {
-        "version": "3.0.0"
     },
     "sensio/framework-extra-bundle": {
         "version": "4.0",

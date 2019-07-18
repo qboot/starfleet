@@ -16,6 +16,7 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Timestampable\Traits\TimestampableEntity;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Table(name="users")
@@ -26,9 +27,9 @@ class User implements UserInterface, \Serializable
     use TimestampableEntity;
 
     /**
-     * @ORM\Column(name="id", type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
+     * @ORM\Id()
+     * @ORM\GeneratedValue()
+     * @ORM\Column(type="integer")
      */
     private $id;
 
@@ -38,14 +39,19 @@ class User implements UserInterface, \Serializable
     private $googleId;
 
     /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $githubId;
+
+    /**
+     * @ORM\Column(type="string", length=180, unique=true)
+     */
+    private $email;
+
+    /**
      * @ORM\Column(name="name", type="string", length=255, nullable=true)
      */
     private $name;
-
-    /**
-     * @ORM\Column(name="email", type="string", length=255, unique=true)
-     */
-    private $email;
 
     /**
      * @ORM\Column(name="bio", type="text", nullable=true)
@@ -67,10 +73,30 @@ class User implements UserInterface, \Serializable
      */
     private $roles = [];
 
+    /**
+     * @Assert\Length(max=4096)
+     */
+    protected $plainPassword;
+
+    /**
+     * @Assert\Length(max=4096)
+     */
+    protected $salt;
+
+    /**
+     * @ORM\Column(type="string", nullable=true)
+     */
+    private $password;
+
     public function __construct()
     {
         $this->submits = new ArrayCollection();
         $this->participations = new ArrayCollection();
+    }
+
+    public function __toString(): string
+    {
+        return $this->getName() ?? (string) $this->id;
     }
 
     public function getId(): ?int
@@ -90,6 +116,18 @@ class User implements UserInterface, \Serializable
         return $this->googleId;
     }
 
+    public function getGithubId(): ?string
+    {
+        return $this->githubId;
+    }
+
+    public function setGithubId(?string $githubId): self
+    {
+        $this->githubId = $githubId;
+
+        return $this;
+    }
+
     public function setName(?string $name): self
     {
         $this->name = $name;
@@ -102,9 +140,14 @@ class User implements UserInterface, \Serializable
         return $this->name;
     }
 
-    public function setEmail(?string $email): self
+    public function getBio(): ?string
     {
-        $this->email = $email;
+        return $this->bio;
+    }
+
+    public function setBio(?string $bio): self
+    {
+        $this->bio = $bio;
 
         return $this;
     }
@@ -114,14 +157,74 @@ class User implements UserInterface, \Serializable
         return $this->email;
     }
 
-    public function getBio(): ?string
+    public function setEmail(string $email): self
     {
-        return $this->bio;
+        $this->email = $email;
+
+        return $this;
     }
 
-    public function setBio(?string $bio): self
+    /**
+     * A visual identifier that represents this user.
+     *
+     * @see UserInterface
+     */
+    public function getUsername(): string
     {
-        $this->bio = $bio;
+        return (string) $this->email;
+    }
+
+    /**
+     * @see UserInterface
+     */
+    public function getRoles(): array
+    {
+        $roles = $this->roles;
+        // guarantee every user at least has ROLE_USER
+        $roles[] = 'ROLE_USER';
+
+        return array_unique($roles);
+    }
+
+    public function setRoles(array $roles): self
+    {
+        $this->roles = $roles;
+
+        return $this;
+    }
+
+    public function addRole(string $role): self
+    {
+        if (!\in_array($role, $this->roles)) {
+            $this->roles[] = $role;
+        }
+
+        return $this;
+    }
+
+    public function getPlainPassword(): ?string
+    {
+        return $this->plainPassword;
+    }
+
+    public function setPlainPassword(?string $plainPassword): self
+    {
+        $this->plainPassword = $plainPassword;
+
+        return $this;
+    }
+
+    /**
+     * @see UserInterface
+     */
+    public function getPassword(): string
+    {
+        return (string) $this->password;
+    }
+
+    public function setPassword(string $password): self
+    {
+        $this->password = $password;
 
         return $this;
     }
@@ -145,68 +248,6 @@ class User implements UserInterface, \Serializable
         return $this->submits;
     }
 
-    public function __toString(): string
-    {
-        return $this->getName() ?? (string) $this->id;
-    }
-
-    public function getRoles(): array
-    {
-        $roles = $this->roles;
-        // guarantee every user at least has ROLE_USER
-        $roles[] = 'ROLE_USER';
-
-        return array_unique($roles);
-    }
-
-    public function addRole(string $role): self
-    {
-        if (!\in_array($role, $this->roles)) {
-            $this->roles[] = $role;
-        }
-
-        return $this;
-    }
-
-    public function getPassword()
-    {
-        return null;
-    }
-
-    public function getSalt()
-    {
-        return null;
-    }
-
-    public function getUsername(): ?string
-    {
-        return $this->getEmail();
-    }
-
-    public function eraseCredentials()
-    {
-    }
-
-    public function serialize(): ?string
-    {
-        return serialize([
-            $this->id,
-            $this->email,
-            $this->googleId,
-        ]);
-    }
-
-    public function unserialize($serialized): ?array
-    {
-        return list(
-            $this->id,
-            $this->email,
-            $this->googleId) = unserialize($serialized);
-    }
-
-    /**
-     * @return Collection|Participation[]
-     */
     public function getParticipations(): Collection
     {
         return $this->participations;
@@ -233,5 +274,43 @@ class User implements UserInterface, \Serializable
         }
 
         return $this;
+    }
+
+    /**
+     * @see UserInterface
+     */
+    public function getSalt()
+    {
+        return $this->salt;
+    }
+
+    /**
+     * @see UserInterface
+     */
+    public function eraseCredentials()
+    {
+        // If you store any temporary, sensitive data on the user, clear it here
+        $this->plainPassword = null;
+    }
+
+    public function serialize(): ?string
+    {
+        return serialize([
+            $this->getId(),
+            $this->getUsername(),
+            $this->getPassword(),
+            $this->getSalt(),
+            $this->getGoogleId(),
+        ]);
+    }
+
+    public function unserialize($serialized): ?array
+    {
+        return list(
+            $this->id,
+            $this->email,
+            $this->password,
+            $this->salt,
+            $this->googleId) = unserialize($serialized);
     }
 }

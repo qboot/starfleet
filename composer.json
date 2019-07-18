@@ -18,6 +18,7 @@
         "easycorp/easy-log-handler": "^1.0.7",
         "easycorp/easyadmin-bundle": "^2.3",
         "knpuniversity/oauth2-client-bundle": "^1.15",
+        "league/oauth2-github": "^2.0",
         "league/oauth2-google": "^3.0",
         "myclabs/php-enum": "^1.6",
         "php-translation/symfony-bundle": "^0.9",
