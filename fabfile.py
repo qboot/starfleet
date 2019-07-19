@@ -76,8 +76,8 @@ def install():
     """
     Install frontend application (composer, yarn, assets)
     """
-    docker_compose_run('COMPOSER_MEMORY_LIMIT=-1 composer install -n --prefer-dist --optimize-autoloader')
-    docker_compose_run('yarn')
+    docker_compose_run('COMPOSER_MEMORY_LIMIT=-1 exec composer install -n --prefer-dist --optimize-autoloader')
+    docker_compose_run('exec yarn')
 
 
 @task
@@ -86,7 +86,7 @@ def upgrade():
     """
     Upgrade application dependencies (composer only)
     """
-    docker_compose_run('COMPOSER_MEMORY_LIMIT=-1 composer update -n -vvv')
+    docker_compose_run('COMPOSER_MEMORY_LIMIT=-1 exec composer update -n')
 
 
 @task
@@ -104,9 +104,9 @@ def reset():
     """
     Reset database
     """
-    docker_compose_run('bin/console doctrine:database:drop --if-exists --force', no_deps=True)
-    docker_compose_run('bin/console doctrine:database:create --if-not-exists', no_deps=True)
-    docker_compose_run('bin/console doctrine:migration:migrate --no-interaction', no_deps=True)
+    docker_compose_run('exec php bin/console doctrine:database:drop --if-exists --force', no_deps=True)
+    docker_compose_run('exec php bin/console doctrine:database:create --if-not-exists', no_deps=True)
+    docker_compose_run('exec php bin/console doctrine:migration:migrate --no-interaction', no_deps=True)
 
 
 @task
@@ -115,8 +115,8 @@ def migrate():
     """
     Migrate database schema
     """
-    docker_compose_run('bin/console doctrine:database:create --if-not-exists', no_deps=True)
-    docker_compose_run('bin/console doctrine:migration:migrate --no-interaction', no_deps=True)
+    docker_compose_run('exec php bin/console doctrine:database:create --if-not-exists', no_deps=True)
+    docker_compose_run('exec php bin/console doctrine:migration:migrate --no-interaction', no_deps=True)
 
 
 @task
@@ -125,7 +125,7 @@ def migration():
     """
     Generate a diff migration
     """
-    docker_compose_run('bin/console make:migration --no-interaction', no_deps=True)
+    docker_compose_run('exec php bin/console make:migration --no-interaction', no_deps=True)
 
 
 @task
@@ -134,7 +134,7 @@ def fixtures():
     """
     Load fixtures into database
     """
-    docker_compose_run('bin/console doctrine:fixtures:load --no-interaction', no_deps=True)
+    docker_compose_run('exec php bin/console doctrine:fixtures:load --no-interaction', no_deps=True)
 
 
 @task
@@ -143,7 +143,7 @@ def fetch():
     """
     Fetch conferences
     """
-    docker_compose_run('bin/console starfleet:conferences:fetch', no_deps=True)
+    docker_compose_run('exec php bin/console starfleet:conferences:fetch', no_deps=True)
 
 
 @task
@@ -152,7 +152,7 @@ def remind():
     """
     Remind ending of CFPs
     """
-    docker_compose_run('bin/console starfleet:conferences:remind-cfp-ending-soon', no_deps=True)
+    docker_compose_run('exec php bin/console starfleet:conferences:remind-cfp-ending-soon', no_deps=True)
 
 
 @task
@@ -162,9 +162,9 @@ def cs_fix(dry_run=False):
     Fix coding standards in code
     """
     if dry_run:
-        docker_compose_run('./vendor/bin/php-cs-fixer fix --config=.php_cs --dry-run --diff', no_deps=True)
+        docker_compose_run('exec php ./vendor/bin/php-cs-fixer fix --config=.php_cs --dry-run --diff', no_deps=True)
     else:
-        docker_compose_run('./vendor/bin/php-cs-fixer fix --config=.php_cs', no_deps=True)
+        docker_compose_run('exec php ./vendor/bin/php-cs-fixer fix --config=.php_cs', no_deps=True)
 
 
 @task
@@ -173,8 +173,9 @@ def tests():
     """
     Launch unit and functional tests
     """
-    docker_compose_run('bin/console doctrine:fixtures:load --no-interaction', no_deps=True)
-    docker_compose_run('SYMFONY_DEPRECATIONS_HELPER=disabled ./vendor/bin/simple-phpunit', no_deps=True)
+    reset()
+    docker_compose_run('exec php bin/console doctrine:fixtures:load --no-interaction', no_deps=True)
+    docker_compose_run('exec php ./vendor/bin/simple-phpunit', no_deps=True)
 
 
 @task
@@ -192,7 +193,7 @@ def webpack():
     """
     Bash into a builder container
     """
-    docker_compose_run('yarn dev')
+    docker_compose_run('exec yarn dev')
 
 
 @task
@@ -201,7 +202,7 @@ def webpack_watch():
     """
     Bash into a builder container
     """
-    docker_compose_run('yarn watch')
+    docker_compose_run('exec yarn watch')
 
 
 @task
