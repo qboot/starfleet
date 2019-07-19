@@ -84,9 +84,10 @@ def install():
 @with_builder
 def upgrade():
     """
-    Upgrade application dependencies (composer only)
+    Upgrade application dependencies (composer and yarn)
     """
     docker_compose_run('COMPOSER_MEMORY_LIMIT=-1 exec composer update -n')
+    docker_compose_run('exec yarn upgrade')
 
 
 @task
