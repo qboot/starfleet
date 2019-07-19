@@ -112,7 +112,7 @@ class Conference
     private $articleUrl;
 
     /**
-     * @ORM\OneToMany(targetEntity="App\Entity\Participation", mappedBy="conference")
+     * @ORM\OneToMany(targetEntity="App\Entity\Participation", mappedBy="conference", cascade={"persist"})
      */
     private $participations;
 
