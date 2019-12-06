@@ -12,6 +12,7 @@ easy_admin:
             - { entity: 'Talk', label: 'Talks', icon: 'file-text-o' }
             - { entity: 'Tag', label: 'Tags', icon: 'tag' }
             - { entity: 'User', label: 'Users', icon: 'users' }
+            - { entity: 'Continent', label: 'Continents', icon: 'globe' }
         assets:
             css:
                 - 'build/css/admin.css'
