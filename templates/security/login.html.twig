@@ -1,6 +1,8 @@
 {% trans_default_domain easyadmin_config('translation_domain') %}
 {% extends easyadmin_config('design.templates.layout') %}
 
+{% block content_title %}{{ easyadmin_config('site_name') }}{% endblock %}
+
 {% block body_class 'page-login' %}
 
 {% block wrapper_wrapper %}
@@ -24,6 +26,12 @@
                 {{ error.messageKey|trans(error.messageData, 'security') }}
             </div>
         {% endif %}
+
+        {% for label, messages in app.flashes %}
+            {% for message in messages %}
+                {{ include('flashes/'~label~'.html.twig', { message: message }) }}
+            {% endfor %}
+        {% endfor %}
 
         <section class="content">
             <form method="post" action="{{ action|default('') }}">
